@@ -1,0 +1,61 @@
+name: Create Kart - Build and Test
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "aurelle-stage1-source/aurelle/**"
+      - ".github/workflows/build-and-test.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "aurelle-stage1-source/aurelle/**"
+      - ".github/workflows/build-and-test.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build and browser tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: aurelle-stage1-source/aurelle
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build and type-check
+        run: npm run build
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser tests
+        run: npm test
+        env:
+          CI: "true"
+
+      - name: Upload production build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: create-kart-dist
+          path: aurelle-stage1-source/aurelle/dist/
+          if-no-files-found: ignore
+          retention-days: 7
+          
