@@ -1,0 +1,16 @@
+AURELLE STAGE 1 - NOTES FOR CODE REVIEWERS (not part of the project)
+
+Contents: the complete project in the aurelle/ folder.
+
+Verification status (honest summary):
+- The real `npm install`, `npm run build` (Vite) and the GitHub Actions run were NOT executed:
+  the npm registry was blocked in the authoring environment. package-lock.json therefore does
+  not exist and is not included. Dependency versions (Vite 7, React 19, TypeScript ~6.0.3,
+  @playwright/test 1.56.0, sharp 0.35) are unverified against the registry.
+- What WAS run: TypeScript strict checks using minimal stand-in type stubs for React/Vite
+  (partial check); a stand-in esbuild bundle of src/ plus the project's real
+  scripts/build-sw.mjs; and all 39 Playwright tests in Chromium against that stand-in build.
+- Not tested: real Vite output, vite preview, real Android devices.
+
+Useful review focus: public/sw.js, scripts/build-sw.mjs, src/pwa/registerServiceWorker.ts,
+tests/*.spec.ts, vite.config.ts, tsconfig*.json, .github/workflows/verify.yml.
